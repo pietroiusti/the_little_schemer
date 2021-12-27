@@ -1,0 +1,32 @@
+* Toys
+** The Law of Car
+*The primitive ~car~ is defined only for non-empty lists.*
+
+(In Emacs Lisp and Common Lisp ~(car '())~ returns ~nil~.)
+** The Law of Cdr
+*The primitive ~cdr~ is defined only for non-empty lists. The ~cdr~ or
+ any non-empty list is always another list*.
+
+ (In Emacs Lisp and Common Lisp ~(cdr '())~ returns ~nil~.)
+
+** The Law of Cons
+*The primitive ~cons~ is defined only for non-empty lists. The second
+argument to ~cons~ must be a list. The result is a list.*
+
+** The Law of Null?
+*The primitive ~null?~ is defined only for lists.*
+
+(In Emacs Lisp we use ~null~.)
+** atom?
+~atom~ takes an S-expression and returns t if it's an atom (that is,
+if it's not a list), nil otherwise
+#+begin_src emacs-lisp
+  (defun atom? (x)
+    (not (listp x)))
+#+end_src
+
+(In elisp there is a bult-in ~atom~ function, but it returns ~t~ also
+when given ~nil~.)
+** The Law of Eq?
+*The primitive ~eq?~ takes two arguments. Each must be a non-numeric
+atom.*
