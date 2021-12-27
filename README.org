@@ -30,3 +30,58 @@ when given ~nil~.)
 ** The Law of Eq?
 *The primitive ~eq?~ takes two arguments. Each must be a non-numeric
 atom.*
+* Do It, Do It Again, and Again, and Again...
+** lat?
+~lat?~ tells us whether a list is a list of atoms (more precisely: a
+list that does not have lists as members).
+#+begin_src emacs-lisp
+  (defun lat? (l)
+    (cond
+     ((null l) t)
+     ((atom? (car l)) (lat? (cdr l)))
+     (t nil)))
+#+end_src
+
+~cond~ is a way to ask several questions in order. If the answer to a
+question is yes, then we return the following S-expression. If it's
+false, then we ask the next question.
+
+~lat?~, using ~cond~, first asks whether the list is empty. If the
+list is empty, then it returns ~t~. If it's not empty, then ~lat?~
+asks the next question. The next question asks whether the first
+member of the list is an atom. If it is an atom, then we recur passing
+the cdr of the list. If it's not an atom, then we return ~nil~,
+because the list is not a list of atoms. If all the member of the list
+are atoms, we recur till when we pass the empty list as the argument
+for ~lat?~.
+
+** member?
+~member~ tells us whether a certain list of atoms contains a certain
+atom as one of its member.
+#+begin_src emacs-lisp
+  (defun member? (a lat)
+    (cond
+     ((null lat) nil)
+     (t (or (eq (car lat) a)
+               (member? a (cdr lat))))))
+#+end_src
+~member?~, like ~lat~, first asks whether ~lat~ is empty. If ~lat~ is
+empty, then it returns ~nil~. If it's not we evaluate an ~or~
+expression. If the first element of ~lat~ is ~a~, then the or
+expression returns ~t~.
+
+*** In js?
+#+begin_src javascript
+  let member = (a, lat) => {
+    if (lat.length == 0)
+      return false;
+    else
+      if (lat[0] === a)
+        return t;
+      else
+        return member(a, lat.slice(1, lat.length));
+  };
+#+end_src
+
+** The First Commandment (preliminary)
+Always ask ~null?~ as the first question in expressing any function.
