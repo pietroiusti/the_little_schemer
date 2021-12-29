@@ -85,3 +85,147 @@ expression returns ~t~.
 
 ** The First Commandment (preliminary)
 Always ask ~null?~ as the first question in expressing any function.
+
+* Cons the Magnificent
+** rember
+~rember~ removes the first occurrence of an atom from a list of atoms.
+#+begin_src emacs-lisp
+  (defun rember (a lat)
+    (cond
+     ((null lat) '())
+     (t (cond
+         ((eq a (car lat) (cdr lat)))
+         (t (cons (car lat) (rember (cdr lat))))))))
+#+end_src
+
+This can be simplified:
+#+begin_src emacs-lisp
+  (defun rember (a lat)
+    (cond
+     ((null lat) '())
+     ((eq a (car lat)) (cdr lat))
+     (t (cons (car lat) (rember a (cdr lat))))))
+#+end_src
+** The Second Commandment
+Use ~cons~ to build lists.
+
+** firsts
+~firsts~ takes either an empty lists of a lists of non-empty lists. In
+the former case it returns nil, in the latter it returns a list with
+the first elements of each internal list.
+#+begin_src emacs-lisp
+(defun firsts (l)
+  (cond
+   ((null l) '())
+   (t (cons (car (car l)) (firsts (cdr l))))))
+#+end_src
+
+** The Third Commandment
+When building a list, describe the first typical element, and then
+~cons~ it onto the natural recursion.
+
+** insertR
+#+begin_src emacs-lisp
+  (defun insertR (new old lat)
+    (cond
+     ((null lat) '())
+     (t (cond
+         ((eq (car lat) old)
+          (cons (car lat)
+                (cons new (cdr lat))))
+         (t (cons (car lat) (insertR new old (cdr lat))))))))
+#+end_src
+** insertL
+#+begin_src emacs-lisp
+  (defun insertL (new old lat)
+    (cond
+     ((null lat) '())
+     (t (cond
+         ((eq (car lat) old) (cons new lat))
+         (t (cons (car lat) (insertL new old (cdr lat))))))))
+#+end_src
+
+** subst
+#+begin_src emacs-lisp
+  (defun subst (new old lat)
+    (cond
+     ((null lat) '())
+     (t (cond
+         ((eq (car lat) old)
+          (cons new (cdr lat)))
+         (t (cons (car lat)
+                  (subst new old
+                         (cdr lat))))))))
+#+end_src
+
+** subst2
+#+begin_src emacs-lisp
+  (defun subst2 (new o1 o2 lat)
+    (cond
+     ((null lat) '())
+     (t (cond
+         ((or (eq (car lat) o1)
+              (eq (car lat) o2))
+          (cons new (cdr lat)))
+         (t (cons (car lat)
+                  (subst new o1 o2
+                         (cdr lat))))))))
+#+end_src
+
+** multirember
+#+begin_src emacs-lisp
+  (defun multirember (a lat)
+    (cond
+     ((null lat) '())
+     (t (cond
+         ((eq (car lat) a)
+          (multirember a (cdr lat)))
+         (t (cons (car lat)
+                  (multirember a (cdr lat))))))))
+#+end_src
+** multiinsertR
+#+begin_src emacs-lisp
+  (defun multiinsertR (new old lat)
+    (cond
+     ((null lat) '())
+     (t (cond
+         ((eq (car lat) old)
+          (cons old
+                (cons new
+                      (multiinsertR new old (cdr lat)))))
+         (t (cons (car lat) (multiinsertR new old (cdr lat))))))))
+#+end_src
+
+** multiinsertL
+#+begin_src emacs-lisp
+  (defun multiinsertL (new old lat)
+    (cond
+     ((null lat) '())
+     (t (cond
+         ((eq (car lat) old)
+          (cons new
+                (cons old
+                      (multiinsertL new old (cdr lat)))))
+         (t (cons (car lat)
+                  (multiinsertL new old (cdr lat))))))))
+#+end_src
+
+** The Fourth Commandment (preliminary)
+Always change at least one argument while recurring. It must be
+changed to be closer to termination. The changing argument must be
+tested in the termination condition:
+
+when using ~cdr~, test termination with ~null?~.
+
+** multisubst
+#+begin_src emacs-lisp
+  (defun multisubst (new old lat)
+    (cond
+     ((null lat) '())
+     (t (cond
+         ((eq (car lat) old)
+          (cons new 
+                (multisubst new old (cdr lat))))
+         (t (cons (car lat)
+                  (multisubst new old (cdr lat))))))))
+#+end_src
