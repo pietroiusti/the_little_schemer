@@ -229,3 +229,125 @@ when using ~cdr~, test termination with ~null?~.
          (t (cons (car lat)
                   (multisubst new old (cdr lat))))))))
 #+end_src
+
+* Numbers Games
+** +
+#+begin_src emacs-lisp
+  (defun plus (n m)
+    (cond
+     ((zerop m) n)
+     (t (1+ (plus n (1- m))))))
+#+end_src
+
+Our use of ~zerop~ is analogous to our previous uses of ~null~.
+Our use of ~1+~ is analogous to our previous uses of ~cons~.
+
+*** alternative
+#+begin_src emacs-lisp
+  (defun plus (n m)
+    (cond
+     ((zerop m) n)
+     (t (plus (1+ n) (1- m)))))
+#+end_src
+** -
+#+begin_src emacs-lisp
+  (defun minus (n m)
+    (cond
+     ((zerop m) n)
+     (t (1- (minus n (1- m))))))
+#+end_src
+** The First Commandment (first revision) 
+When recurring on a list of atoms, ~lat~, ask two questions about it:
+~(null lat)~ and ~t~.
+
+When recurring on a number, ~n~, ask two questions about it: ~(zerop
+n)~ and ~t~.
+** addtup
+#+begin_src emacs-lisp
+  (defun addtup (tup)
+    (cond
+     ((null tup) 0)
+     (t (+ (car tup) (addtup (cdr tup))))))
+#+end_src
+** The Fourth Commandment (first revision)
+** X
+#+begin_src emacs-lisp
+  (defun times (a b)
+    (cond
+     ((zerop b) 0)
+     (t (plus a (times a (1- b))))))
+#+end_src
+** tup+
+#+begin_src emacs-lisp
+  (defun tup+ (tup1 tup2)
+    (cond
+     ((and (null tup1) (null tup2)) '())
+     (t (cons (+ (car tup1) (car tup2))
+              (tup+ (cdr tup1) (cdr tup2))))))
+#+end_src
+
+Let's make it work with tups of different lengths
+#+begin_src emacs-lisp
+  (defun tup+ (tup1 tup2)
+    (cond
+     ((null tup1) tup2)
+     ((null tup2) tup1)
+     (t (cons
+         (+ (car tup1) (car tup2))
+         (tup+ (cdr tup1) (cdr tup2))))))
+#+end_src
+** >
+#+begin_src emacs-lisp
+  (defun greater-than (n m)
+    (cond
+     ((zerop n) nil)
+     ((zerop m) t)
+     (t (greater-than (1- n) (1- m)))))
+#+end_src
+** <
+#+begin_src emacs-lisp
+  (defun less-than (n m)
+    (cond
+     ((zerop m) nil)
+     ((zerop n) t)
+     (t (less-than (1- n) (1- m)))))
+#+end_src
+** =
+#+begin_src emacs-lisp
+  (defun equal-to (n m)
+    (cond
+     ((zerop m) (zerop n))
+     ((zerp n) nil)
+     (t (equal-to (1- n) (1- m)))))
+#+end_src
+
+Using ~greater-than~ and ~less-than~:
+#+begin_src emacs-lisp
+  (defun equal-to (n m)
+    (cond
+     ((greater-than n m) nil)
+     ((less-than n m) nil)
+     (t t)))
+#+end_src
+** ↑
+#+begin_src emacs-lisp
+  (defun ↑ (n m)
+      (cond
+       ((zerop m) 1)
+       ((times n (↑ n (1- m))))))
+#+end_src
+** ÷
+#+begin_src emacs-lisp
+  (defun ÷ (n m)
+    (cond
+     ((< n m) 0)
+     (t (1+ (÷ (- n m) m)))))
+#+end_src
+
+** length
+#+begin_src emacs-lisp
+  (defun ls-length (lat)
+    (cond
+     ((null lat) 0)
+     (t (1+ (ls-length (cdr lat))))))
+#+end_src
