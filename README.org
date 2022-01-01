@@ -351,3 +351,85 @@ Using ~greater-than~ and ~less-than~:
      ((null lat) 0)
      (t (1+ (ls-length (cdr lat))))))
 #+end_src
+
+** pick
+#+begin_src emacs-lisp
+  (defun pick (n lat)
+    (cond
+     ((zerop (1- n)) (car lat))
+     (t (pick (1- n) (cdr lat)))))
+
+  ;; my slighlty different solution:
+  (defun pick (n lat)
+    (cond
+     ((eq 1 n) (car lat))
+     (t (pick (1- n) (cdr lat)))))
+#+end_src
+
+** rempick
+#+begin_src emacs-lisp
+  (defun rempick (n lat)
+    (cond
+     ((eq n 1) (cdr lat))
+     (t (cons (car lat) (rempick (1- n) (cdr lat))))))
+#+end_src
+
+** no-nums
+#+begin_src emacs-lisp
+  (defun no-nums (lat)
+    (cond
+     ((null lat) '())
+     (t (cond
+         ((numberp (car lat)) (no-nums (cdr lat)))
+         (t (cons (car lat) (no-nums (cdr lat))))))))
+#+end_src
+
+** all-nums
+#+begin_src emacs-lisp
+  (defun all-nums (lat)
+    (cond
+     ((null lat) '())
+     (t (cond
+         ((numberp (car lat))
+          (cons (car lat)
+                (all-nums (cdr lat))))
+         (t (all-nums (cdr lat)))))))
+#+end_src
+
+** eqan?
+#+begin_src emacs-lisp
+  (defun eqan? (a1 a2)
+    (cond
+     ((and (numberp a1) (numberp a2))
+      (= a1 a2))
+     ((or (numberp a1) (numberp a2))
+      nil)
+     (t (eq a1 a2))))
+#+end_src
+
+** occur
+#+begin_src emacs-lisp
+  (defun occur (a lat)
+    (cond
+     ((null lat) 0)
+     (t (cond
+         ((eq (car lat) a)
+          (1+ (occur a (cdr lat))))
+         (t (occur a (cdr lat)))))))
+#+end_src
+
+** one?
+#+begin_src emacs-lisp
+  (defun one? (n)
+    (eq 1 n))
+#+end_src
+
+** rempick (using ~one?~)
+#+begin_src emacs-lisp
+  (defun rempick (n lat)
+    (cond
+     ((one? n) (cdr lat))
+     (t (cons (car lat)
+              (rempick (1- n)
+                       (cdr lat))))))
+#+end_src
