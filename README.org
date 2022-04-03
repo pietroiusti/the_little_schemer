@@ -1,8 +1,6 @@
 * Toys
 - The Law of Car :: 
-  #+begin_quote
   The primitive ~car~ is defined only for non-empty lists.
-  #+end_quote
 
 (In Emacs Lisp and Common Lisp ~(car '())~ returns ~nil~. Moreover, it
 can be applied to cons cells too, not only to lists.)
