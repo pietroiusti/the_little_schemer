@@ -36,6 +36,8 @@ when given ~nil~.)
 - The Law of Eq ::
   The primitive ~eq?~ takes two arguments. Each must be a non-numeric
   atom.
+
+(In elisp we have ~eq~...)
 * Do It, Do It Again, and Again, and Again...
 ** lat?
 ~lat?~ tells us whether a list is a list of atoms (more precisely: a
