@@ -40,8 +40,8 @@ when given ~nil~.)
 (In elisp we have ~eq~...)
 * Do It, Do It Again, and Again, and Again...
 ** lat?
-~lat?~ tells us whether a list is a list of atoms (more precisely: a
-list that does not have lists as members).
+~lat?~ tells us whether a list is a list of atoms (that is, a list
+that does not have lists as members, given that atom = non-list).
 #+begin_src emacs-lisp
   (defun lat? (l)
     (cond
@@ -74,11 +74,12 @@ atom as one of its member.
                (member? a (cdr lat))))))
 #+end_src
 ~member?~, like ~lat~, first asks whether ~lat~ is empty. If ~lat~ is
-empty, then it returns ~nil~. If it's not we evaluate an ~or~
+empty, then it returns ~nil~. If it's not, then we evaluate an ~or~
 expression. If the first element of ~lat~ is ~a~, then the or
-expression returns ~t~.
+expression returns ~t~, otherwise we recur on the cdr.
 
-*** In js?
+*** member? in JavaScript?
+This is the way I would write it:
 #+begin_src javascript
   let member = (a, lat) => {
     if (lat.length == 0)
@@ -90,11 +91,14 @@ expression returns ~t~.
         return member(a, lat.slice(1, lat.length));
   };
 #+end_src
-
+Not as elegant as the lisp version...
 ** The First Commandment (preliminary)
 Always ask ~null?~ as the first question in expressing any function.
 
 * Cons the Magnificent
+** The Second Commandment
+Use ~cons~ to build lists.
+
 ** rember
 ~rember~ removes the first occurrence of an atom from a list of atoms.
 #+begin_src emacs-lisp
@@ -103,7 +107,8 @@ Always ask ~null?~ as the first question in expressing any function.
      ((null lat) '())
      (t (cond
          ((eq a (car lat) (cdr lat)))
-         (t (cons (car lat) (rember (cdr lat))))))))
+         (t (cons (car lat)
+                  (rember a (cdr lat))))))))
 #+end_src
 
 This can be simplified:
@@ -112,25 +117,25 @@ This can be simplified:
     (cond
      ((null lat) '())
      ((eq a (car lat)) (cdr lat))
-     (t (cons (car lat) (rember a (cdr lat))))))
+     (t (cons (car lat)
+              (rember a (cdr lat))))))
 #+end_src
-** The Second Commandment
-Use ~cons~ to build lists.
+
+** The Third Commandment
+When building a list, describe the first typical element, and then
+~cons~ it onto the natural recursion.
 
 ** firsts
 ~firsts~ takes either an empty lists of a lists of non-empty lists. In
 the former case it returns nil, in the latter it returns a list with
 the first elements of each internal list.
 #+begin_src emacs-lisp
-(defun firsts (l)
-  (cond
-   ((null l) '())
-   (t (cons (car (car l)) (firsts (cdr l))))))
+  (defun firsts (l)
+    (cond
+     ((null l) '())
+     (t (cons (car (car l))
+              (firsts (cdr l))))))
 #+end_src
-
-** The Third Commandment
-When building a list, describe the first typical element, and then
-~cons~ it onto the natural recursion.
 
 ** insertR
 #+begin_src emacs-lisp
