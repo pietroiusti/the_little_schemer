@@ -121,6 +121,10 @@ This can be simplified:
               (rember a (cdr lat))))))
 #+end_src
 
+The authors say that they don't simplify it right away, ``because then
+a function's structure does not coincide with its argument's
+structure.'' I found that statement a bit cryptic. [[https://stackoverflow.com/questions/31736044/the-little-schemer-what-is-a-function-or-arguments-structure?rq=1][I'm not alone]].
+
 ** The Third Commandment
 When building a list, describe the first typical element, and then
 ~cons~ it onto the natural recursion.
@@ -138,6 +142,7 @@ the first elements of each internal list.
 #+end_src
 
 ** insertR
+~insertR~ insert ~new~ after the first occurence of ~old~ in ~lat~.
 #+begin_src emacs-lisp
   (defun insertR (new old lat)
     (cond
@@ -148,7 +153,22 @@ the first elements of each internal list.
                 (cons new (cdr lat))))
          (t (cons (car lat) (insertR new old (cdr lat))))))))
 #+end_src
+This could be simplified, in the same way rember has been simplified
+above... Same for the fuctions that follows that have the same
+structure as rember.
 ** insertL
+~insertR~ insert ~new~ before the first occurence of ~old~ in ~lat~.
+#+begin_src emacs-lisp
+  (defun insertL (new old lat)
+    (cond
+     ((null lat) '())
+     (t (cond
+         ((eq (car lat) old)
+          (cons new (cons old (cdr lat))))
+         (t (cons (car lat) (insertL new old (cdr lat))))))))
+#+end_src
+Given that ~(cons (car foo) (cdr foo))~ is nothing more than ~foo~, we
+could have said:
 #+begin_src emacs-lisp
   (defun insertL (new old lat)
     (cond
@@ -157,8 +177,8 @@ the first elements of each internal list.
          ((eq (car lat) old) (cons new lat))
          (t (cons (car lat) (insertL new old (cdr lat))))))))
 #+end_src
-
 ** subst
+~subst~ replaces the first occurrences of ~old~ in ~lat~ with ~new~.
 #+begin_src emacs-lisp
   (defun subst (new old lat)
     (cond
@@ -170,7 +190,6 @@ the first elements of each internal list.
                   (subst new old
                          (cdr lat))))))))
 #+end_src
-
 ** subst2
 #+begin_src emacs-lisp
   (defun subst2 (new o1 o2 lat)
@@ -181,10 +200,9 @@ the first elements of each internal list.
               (eq (car lat) o2))
           (cons new (cdr lat)))
          (t (cons (car lat)
-                  (subst new o1 o2
+                  (subst2 new o1 o2
                          (cdr lat))))))))
 #+end_src
-
 ** multirember
 #+begin_src emacs-lisp
   (defun multirember (a lat)
@@ -208,7 +226,6 @@ the first elements of each internal list.
                       (multiinsertR new old (cdr lat)))))
          (t (cons (car lat) (multiinsertR new old (cdr lat))))))))
 #+end_src
-
 ** multiinsertL
 #+begin_src emacs-lisp
   (defun multiinsertL (new old lat)
@@ -222,14 +239,12 @@ the first elements of each internal list.
          (t (cons (car lat)
                   (multiinsertL new old (cdr lat))))))))
 #+end_src
-
 ** The Fourth Commandment (preliminary)
 Always change at least one argument while recurring. It must be
 changed to be closer to termination. The changing argument must be
 tested in the termination condition:
 
 when using ~cdr~, test termination with ~null?~.
-
 ** multisubst
 #+begin_src emacs-lisp
   (defun multisubst (new old lat)
@@ -242,7 +257,6 @@ when using ~cdr~, test termination with ~null?~.
          (t (cons (car lat)
                   (multisubst new old (cdr lat))))))))
 #+end_src
-
 * Numbers Games
 ** +
 #+begin_src emacs-lisp
