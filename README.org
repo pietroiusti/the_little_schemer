@@ -260,25 +260,22 @@ when using ~cdr~, test termination with ~null?~.
 * Numbers Games
 ** +
 #+begin_src emacs-lisp
-  (defun plus (n m)
+  (defun + (n m)
     (cond
      ((zerop m) n)
      (t (1+ (plus n (1- m))))))
 #+end_src
 
-Our use of ~zerop~ is analogous to our previous uses of ~null~.
-Our use of ~1+~ is analogous to our previous uses of ~cons~.
-
-*** alternative
+A possible alternative:
 #+begin_src emacs-lisp
-  (defun plus (n m)
+  (defun + (n m)
     (cond
      ((zerop m) n)
      (t (plus (1+ n) (1- m)))))
 #+end_src
 ** -
 #+begin_src emacs-lisp
-  (defun minus (n m)
+  (defun - (n m)
     (cond
      ((zerop m) n)
      (t (1- (minus n (1- m))))))
@@ -297,13 +294,30 @@ n)~ and ~t~.
      (t (+ (car tup) (addtup (cdr tup))))))
 #+end_src
 ** The Fourth Commandment (first revision)
+Always change at least one argument while recurring. It must be
+changed to be closer to termination. The changing argument must be
+tested in the termination condition:
+
+when using ~cdr~, test termination with ~null~ and when using ~1-~ ,
+test termination with ~zerop~.
 ** X
 #+begin_src emacs-lisp
-  (defun times (a b)
+  (defun × (n m)
     (cond
-     ((zerop b) 0)
-     (t (plus a (times a (1- b))))))
+     ((zerop m) 0)
+     (t (+ n (× n (1- m))))))
 #+end_src
+** The Fifth Commandment
+When building a value with ~+~, always use 0 for the value of the
+terminating line, for adding 0 does not change the value of an
+addition.
+
+When building a value with ~×~, always use 1 for the value of the
+terminating line, for multipling by 1 does not change the value of a
+multiplication.
+
+When building a value with ~cons~, always consider ~()~ for the value
+of the terminating line.
 ** tup+
 #+begin_src emacs-lisp
   (defun tup+ (tup1 tup2)
@@ -325,35 +339,35 @@ Let's make it work with tups of different lengths
 #+end_src
 ** >
 #+begin_src emacs-lisp
-  (defun greater-than (n m)
+  (defun > (n m)
     (cond
      ((zerop n) nil)
      ((zerop m) t)
-     (t (greater-than (1- n) (1- m)))))
+     (t (> (1- n) (1- m)))))
 #+end_src
 ** <
 #+begin_src emacs-lisp
-  (defun less-than (n m)
+  (defun < (n m)
     (cond
      ((zerop m) nil)
      ((zerop n) t)
-     (t (less-than (1- n) (1- m)))))
+     (t (< (1- n) (1- m)))))
 #+end_src
 ** =
 #+begin_src emacs-lisp
-  (defun equal-to (n m)
+  (defun = (n m)
     (cond
      ((zerop m) (zerop n))
      ((zerp n) nil)
-     (t (equal-to (1- n) (1- m)))))
+     (t (= (1- n) (1- m)))))
 #+end_src
 
 Using ~greater-than~ and ~less-than~:
 #+begin_src emacs-lisp
   (defun equal-to (n m)
     (cond
-     ((greater-than n m) nil)
-     ((less-than n m) nil)
+     ((> n m) nil)
+     ((< n m) nil)
      (t t)))
 #+end_src
 ** ↑
@@ -361,7 +375,7 @@ Using ~greater-than~ and ~less-than~:
   (defun ↑ (n m)
       (cond
        ((zerop m) 1)
-       ((times n (↑ n (1- m))))))
+       ((× n (↑ n (1- m))))))
 #+end_src
 ** ÷
 #+begin_src emacs-lisp
@@ -370,29 +384,20 @@ Using ~greater-than~ and ~less-than~:
      ((< n m) 0)
      (t (1+ (÷ (- n m) m)))))
 #+end_src
-
 ** length
 #+begin_src emacs-lisp
-  (defun ls-length (lat)
+  (defun length (lat)
     (cond
      ((null lat) 0)
-     (t (1+ (ls-length (cdr lat))))))
+     (t (1+ (length (cdr lat))))))
 #+end_src
-
 ** pick
 #+begin_src emacs-lisp
   (defun pick (n lat)
     (cond
      ((zerop (1- n)) (car lat))
      (t (pick (1- n) (cdr lat)))))
-
-  ;; my slighlty different solution:
-  (defun pick (n lat)
-    (cond
-     ((eq 1 n) (car lat))
-     (t (pick (1- n) (cdr lat)))))
 #+end_src
-
 ** rempick
 #+begin_src emacs-lisp
   (defun rempick (n lat)
@@ -400,7 +405,6 @@ Using ~greater-than~ and ~less-than~:
      ((eq n 1) (cdr lat))
      (t (cons (car lat) (rempick (1- n) (cdr lat))))))
 #+end_src
-
 ** no-nums
 #+begin_src emacs-lisp
   (defun no-nums (lat)
@@ -410,7 +414,6 @@ Using ~greater-than~ and ~less-than~:
          ((numberp (car lat)) (no-nums (cdr lat)))
          (t (cons (car lat) (no-nums (cdr lat))))))))
 #+end_src
-
 ** all-nums
 #+begin_src emacs-lisp
   (defun all-nums (lat)
@@ -422,7 +425,6 @@ Using ~greater-than~ and ~less-than~:
                 (all-nums (cdr lat))))
          (t (all-nums (cdr lat)))))))
 #+end_src
-
 ** eqan?
 #+begin_src emacs-lisp
   (defun eqan? (a1 a2)
@@ -433,7 +435,6 @@ Using ~greater-than~ and ~less-than~:
       nil)
      (t (eq a1 a2))))
 #+end_src
-
 ** occur
 #+begin_src emacs-lisp
   (defun occur (a lat)
@@ -444,13 +445,11 @@ Using ~greater-than~ and ~less-than~:
           (1+ (occur a (cdr lat))))
          (t (occur a (cdr lat)))))))
 #+end_src
-
 ** one?
 #+begin_src emacs-lisp
   (defun one? (n)
     (eq 1 n))
 #+end_src
-
 ** rempick (using ~one?~)
 #+begin_src emacs-lisp
   (defun rempick (n lat)
@@ -460,7 +459,6 @@ Using ~greater-than~ and ~less-than~:
               (rempick (1- n)
                        (cdr lat))))))
 #+end_src
-
 * Oh My Gawd: It's Full of Stars
 ** rember*
 #+begin_src emacs-lisp
