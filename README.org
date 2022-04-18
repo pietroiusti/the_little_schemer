@@ -467,7 +467,7 @@ Using ~greater-than~ and ~less-than~:
      ((null l) '())
      ((atom? (car l))
       (cond
-       ((eq (car l) q)
+       ((eq (car l) a)
         (rember* a (cdr l)))
        (t (cons (car l)
                 (rember* a (cdr l))))))
@@ -556,7 +556,16 @@ test termination with ~zerop~.
      (t (cons (insertL* new old (car l))
               (insertL* new old (cdr l))))))
 #+end_src
-
+** member*
+#+begin_src emacs-lisp
+  (defun member* (a l)
+    (cond
+     ((null l) nil)
+     ((atom (car l)) (or (eq? (car l) a)
+                         (member* a (cdr l))))
+     (t (or (member* a (car l))
+            (member* a (cdr l))))))
+#+end_src
 ** leftmost
 #+begin_src emacs-lisp
   (defun leftmost (l)
@@ -564,7 +573,6 @@ test termination with ~zerop~.
      ((atom? (car l)) (car l))
      (t (leftmost (car l)))))
 #+end_src
-
 ** eqlist?
 #+begin_src emacs-lisp
   (defun eqlist? (l1 l2)
@@ -598,7 +606,6 @@ Simplifying:
       (and (eqlist? (car l1) (car l2))
            (eqlist? (cdr l1) (cdr l2))))))
 #+end_src
-
 ** equal?
 #+begin_src emacs-lisp
   (defun equal? (s1 s2)
@@ -619,7 +626,6 @@ Simplifying:
      ((or (atom? s1) (atom? s2)) nil)
      (t (eqlist? s1 s2))))
 #+end_src
-
 ** eqlist? (using equal?)
 #+begin_src emacs-lisp
   (defun eqlist? (l1 l2)
@@ -630,10 +636,8 @@ Simplifying:
       (and (equal? (car l1) (car l2))
            (eqlist? (cdr l1) (cdr l2))))))
 #+end_src
-
 ** The Sixth Commandment
 Simplify only after the function is correct.
-
 ** rember (for l instead of lat)
 #+begin_src emacs-lisp
   (defun rember (s l)
@@ -643,7 +647,6 @@ Simplify only after the function is correct.
      (t (cons (car l)
               (rember s (cdr l))))))
 #+end_src
-
 * Shadows
 ** numbered?
 #+begin_src emacs-lisp
