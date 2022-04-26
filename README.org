@@ -649,8 +649,29 @@ Simplify only after the function is correct.
 #+end_src
 * Shadows
 ** numbered?
+~numbered?~ tells whether an arithmetic expression is made only by
+numbers, besides +, ×, and ↑.
+
 #+begin_src emacs-lisp
-  (defun numbered (aexp)
+  (defun numbered? (aexp)
+    (cond
+     ((atom? (car aexp)) (number? (car aexp)))
+     ((eq (car (cdr aexp) '+))
+      (and (numbered? (car aexp))
+           (numbered? (car (cdr (cdr aexp))))))
+     ((eq (car (cdr aexp) '×))
+      (and (numbered? (car aexp))
+           (numbered? (car (cdr (cdr aexp))))))
+     ((eq (car (cdr aexp) '↑))
+      (and (numbered? (car aexp))
+           (numbered? (car (cdr (cdr aexp))))))))
+#+end_src
+
+Given that aexp is an arithmetic expression, we know that if it's not
+an atom, then the car of the cdr of aexp must be either + or × or
+↑. So we can write ~numbered?~ in a simpler way:
+#+begin_src emacs-lisp
+  (defun numbered? (aexp)
     (cond
      ((atom? aexp) (number? aexp))
      (t
@@ -661,7 +682,33 @@ Simplify only after the function is correct.
 ** The Seventh Commandment
 Recur on the /subparts/ that are of the same nature:
 - On the sublists of a list.
-- On the subexpressions of an arithmetic expression. 
+- On the subexpressions of an arithmetic expression.
+** value
+~value~ gives you the value of an arithmetic expression. For example
+the value of the expression (+ 1 2) is 3. We'll use some help
+function.
+#+begin_src emacs-lisp
+  (defun 1st-sub-exp (aexp)
+    (car (cdr aexp)))
+
+  (defun 2nd-sub-exp (aexp)
+    (car (cdr (cdr aexp))))
+
+  (defun operator (aexp)
+    (car aexp))
+
+  (defun value (nexp)
+    (cond
+     ((atom? (nextp)) nexp)
+     ((eq (operator nexp) '+)
+      (+ (value (1st-sub-exp nexp))
+         (value (2nd-sub-exp nexp))))
+     ((eq (operator nexp) '×)
+      (× (value (1st-sub-exp nexp))
+         (value (2nd-sub-exp nexp))))
+     (t (↑ (value (1st-sub-exp nexp))
+         (value (2nd-sub-exp nexp))))))
+#+end_src
 ** The Eight Commandment
 Use help functions to abstract from representations.
 
