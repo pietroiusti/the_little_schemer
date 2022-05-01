@@ -711,4 +711,33 @@ function.
 #+end_src
 ** The Eight Commandment
 Use help functions to abstract from representations.
+* Friends and Relations
+** setp
+#+begin_src emacs-lisp
+  (defun setp (lat)
+    (cond
+     ((null lat) t)
+     ((memberp (car lat) (cdr lat)) nil)
+     (t (setp (cdr lat)))))
+#+end_src
+** makeset
+#+begin_src emacs-lisp
+  (defun makeset (lat)
+    (cond
+     ((null lat) '())
+     ((memberp (car lat) (cdr lat))
+      (makeset (cdr lat)))
+     (t (cons (car lat)
+              (makeset (cdr lat))))))
+#+end_src
 
+Using ~multiremember~:
+#+begin_src emacs-lisp
+  (defun makeset (lat)
+      (cond
+       ((null lat) '())
+       (t (cons (car lat)
+                (makeset multiremember
+                         (car lat)
+                         (cdr lat))))))
+#+end_src
