@@ -741,3 +741,50 @@ Using ~multiremember~:
                          (car lat)
                          (cdr lat))))))
 #+end_src
+* Lambda the Ultimate
+** rember-f
+#+begin_src emacs-lisp
+  (defun rember-f (testp)
+    (lambda (a l)
+      (cond
+       ((null l) '())
+       ((funcall testp (car l) a) (cdr l))
+       (t (cons (car l) (funcall (rember-f testp) a (cdr l)))))))
+#+end_src
+** insertL-f
+#+begin_src emacs-lisp
+  (defun insertL-f (testp)
+    (lambda (new old l)
+      (cond
+       ((null l) '())
+       ((funcall testp (car l) old)
+        (cons new (cons old (cdr l))))
+       (t (cons (car l) (funcall (insertL-f testp) new old (cdr l)))))))
+#+end_src
+#+begin_src emacs-lisp
+  (funcall (insertL-f 'eq) 10 5 '(1 2 5 9))
+#+end_src
+** insertR-f
+#+begin_src emacs-lisp
+  (defun insertR-f (testp)
+    (lambda (new old l)
+      (cond
+       ((null l) '())
+       ((funcall testp (car l) old )
+        (cons (car l) (cons new (cdr l))))
+       (t (cons (car l) (funcall (insertR-f testp) new old (cdr l)))))))
+#+end_src
+#+begin_src emacs-lisp
+  (funcall (insertR-f 'eq) 10 5 '(1 2 5 9))
+#+end_src
+** insert-g
+#+begin_src emacs-lisp
+  (defun insert-g (seq)
+    (lambda (new old l)
+      (cond
+       ((null l) '())
+       ((eq (car l) old)
+        (funcall seq new old (cdr l)))
+       (t (cons (car l)
+                (funcall (insert-g seq) new old (cdr l)))))))
+#+end_src
