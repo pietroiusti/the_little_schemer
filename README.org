@@ -744,6 +744,13 @@ Using ~multiremember~:
 * Lambda the Ultimate
 ** rember-f
 #+begin_src emacs-lisp
+  (defun rember-f (testp a l)
+    (cond
+     ((null l) '())
+     ((funcall testp (car l) a) (cdr l))
+     (t (cons (car l) (rember-f testp a (cdr l))))))
+#+end_src
+#+begin_src emacs-lisp
   (defun rember-f (testp)
     (lambda (a l)
       (cond
