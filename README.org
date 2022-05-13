@@ -26,7 +26,7 @@ about that...)
   ~atom~ takes an S-expression and returns t if it's an atom (that is,
   if it's not a list), nil otherwise:
   #+begin_src emacs-lisp
-    (defun atom? (x)
+    (defun atomp (x)
       (not (listp x)))
   #+end_src
 
@@ -46,7 +46,7 @@ that does not have lists as members, given that atom = non-list).
   (defun lat? (l)
     (cond
      ((null l) t)
-     ((atom? (car l)) (lat? (cdr l)))
+     ((atomp (car l)) (lat? (cdr l)))
      (t nil)))
 #+end_src
 
@@ -465,7 +465,7 @@ Using ~greater-than~ and ~less-than~:
   (defun rember* (a l)
     (cond
      ((null l) '())
-     ((atom? (car l))
+     ((atomp (car l))
       (cond
        ((eq (car l) a)
         (rember* a (cdr l)))
@@ -480,7 +480,7 @@ Using ~greater-than~ and ~less-than~:
   (defun insertR* (new old l)
     (cond
      ((null l) '())
-     ((atom? (car l)
+     ((atomp (car l)
              (cond
               ((eq (car l) old)
                (cons old
@@ -500,12 +500,12 @@ When recurring on a number, ~n~, ask two questions about it: ~(zero?
 n)~ and else.
 
 When recurring on a list of S-expressions, ~l~, ask three questions
-about it: ~(null l)~, ~(atom? (car l))~, and else.
+about it: ~(null l)~, ~(atomp (car l))~, and else.
 ** The Fourth Commandment (final version)
 Always change at least one argument while recurring. When recurring on
 a list of atoms, ~lat~, use ~(cdr lat)~. When recurring on a number,
 ~n~, use ~(1- n)~. And when recurring on a list of S-expressions, ~l~,
-use ~(car l)~ and ~(cdr l)~ if neither ~(null? l)~ nor ~(atom?  (car
+use ~(car l)~ and ~(cdr l)~ if neither ~(null? l)~ nor ~(atomp  (car
 l))~ are true.
 
 It must be changed to be closer to termination. The changing argument
@@ -518,7 +518,7 @@ test termination with ~zerop~.
   (defun occur* (a l)
     (cond
      ((null l) 0)
-     ((atom? (car l))
+     ((atomp (car l))
       (cond
        ((eq (car l) a)
         (1+ (occur* a (cdr l))))
@@ -544,7 +544,7 @@ test termination with ~zerop~.
   (defun insertL* (new old l)
     (cond
      ((null l) '())
-     ((atom? (car l))
+     ((atomp (car l))
       (cond
        ((eq (car l) old)
         (cons new
@@ -570,7 +570,7 @@ test termination with ~zerop~.
 #+begin_src emacs-lisp
   (defun leftmost (l)
     (cond
-     ((atom? (car l)) (car l))
+     ((atomp (car l)) (car l))
      (t (leftmost (car l)))))
 #+end_src
 ** eqlist?
@@ -578,15 +578,15 @@ test termination with ~zerop~.
   (defun eqlist? (l1 l2)
     (cond
      ((and (null l1) (null? l2)) t)
-     ((and (null l1) (atom? (car l2))) nil)
+     ((and (null l1) (atomp (car l2))) nil)
      ((null? l1) nil)
-     ((and (atom? (car l1)) (null l2)) nil)
-     ((and (atom? (car l1) (atom? (car l2))))
+     ((and (atomp (car l1)) (null l2)) nil)
+     ((and (atomp (car l1) (atomp (car l2))))
       (and (eqan? (car l1) (car l2))
            (eqlist? (cdr l1) (cdr l2)))) ;; do some shit
-     ((atom? (car l1)) nil)
+     ((atomp (car l1)) nil)
      ((null l2) nil)
-     ((atom? (car l2)) nil)
+     ((atomp (car l2)) nil)
      (t
       (and (eqlist? (car l1) (car l2))
            (eqlist? (cdr l1) (cdr l2))))))
@@ -598,10 +598,10 @@ Simplifying:
     (cond
      ((and (null l1) (null l2)) t)
      ((or (null l1) (null l2)) nil)
-     ((and (atom? (car l1) (atom? (car l2))))
+     ((and (atomp (car l1) (atomp (car l2))))
       (and (eqan? (car l1) (car l2))
            (eqlist? (cdr l1) (cdr l2)))) ;; do some shit
-     ((or (atom? (car l1) (car l2))) nil)
+     ((or (atomp (car l1) (car l2))) nil)
      (t
       (and (eqlist? (car l1) (car l2))
            (eqlist? (cdr l1) (cdr l2))))))
@@ -610,10 +610,10 @@ Simplifying:
 #+begin_src emacs-lisp
   (defun equal? (s1 s2)
     (cond
-     ((and (atom? s1) (atom? s2))
+     ((and (atomp s1) (atomp s2))
       (eqan? s1 s2))
-     ((atom? s1) nil)
-     ((atom? s2) nil)
+     ((atomp s1) nil)
+     ((atomp s2) nil)
      (t (eqlist? s1 s2))))
 #+end_src
 
@@ -621,9 +621,9 @@ Simplifying:
 #+begin_src emacs-lisp
   (defun equal? (s1 s2)
     (cond
-     ((and (atom? s1) (atom? s2))
+     ((and (atomp s1) (atomp s2))
       (eqan? s1 s2))
-     ((or (atom? s1) (atom? s2)) nil)
+     ((or (atomp s1) (atomp s2)) nil)
      (t (eqlist? s1 s2))))
 #+end_src
 ** eqlist? (using equal?)
@@ -655,7 +655,7 @@ numbers, besides +, ×, and ↑.
 #+begin_src emacs-lisp
   (defun numbered? (aexp)
     (cond
-     ((atom? (car aexp)) (number? (car aexp)))
+     ((atomp (car aexp)) (number? (car aexp)))
      ((eq (car (cdr aexp) '+))
       (and (numbered? (car aexp))
            (numbered? (car (cdr (cdr aexp))))))
@@ -673,7 +673,7 @@ an atom, then the car of the cdr of aexp must be either + or × or
 #+begin_src emacs-lisp
   (defun numbered? (aexp)
     (cond
-     ((atom? aexp) (number? aexp))
+     ((atomp aexp) (number? aexp))
      (t
       (and (numbered? (car aexp))
            (numbered?
@@ -699,7 +699,7 @@ function.
 
   (defun value (nexp)
     (cond
-     ((atom? (nextp)) nexp)
+     ((atomp nexp) nexp)
      ((eq (operator nexp) '+)
       (+ (value (1st-sub-exp nexp))
          (value (2nd-sub-exp nexp))))
@@ -839,3 +839,23 @@ Surprise, surprise, this is rember:
 #+begin_quote
 Abstract common patterns with a new function.
 #+end_quote
+** multirember-f
+#+begin_src emacs-lisp
+  (defun multirember-f (testp)
+    (lambda (a lat)
+      (cond
+       ((null lat) '())
+       ((funcall testp a (car lat))
+        (funcall (multirember-f testp) a (cdr lat)))
+       (t (cons (car lat)
+                (funcall (multirember-f testp) a (cdr lat)))))))
+#+end_src
+** multiremberT
+#+begin_src emacs-lisp
+  (defun multiremberT (testp lat)
+    (cond
+     ((null lat) '())
+     ((funcall testp (car lat)) (multiremberT testp (cdr lat)))
+     (t (cons (car lat) (multiremberT testp (cdr lat))))))
+#+end_src
+
