@@ -858,4 +858,70 @@ Abstract common patterns with a new function.
      ((funcall testp (car lat)) (multiremberT testp (cdr lat)))
      (t (cons (car lat) (multiremberT testp (cdr lat))))))
 #+end_src
+** multirember&co
+#+begin_src emacs-lisp
+  (defun multirember&co (a lat col)
+    (cond
+     ((null lat)
+      (funcall col '() '()))
+     ((eq (car lat) a)
+      (multirember&co a
+                      (cdr lat)
+                      (lambda (newlat seen)
+                        (funcall col newlat
+                                 (cons (car lat) seen)))))
+     (t
+      (multirember&co a
+                      (cdr lat)
+                      (lambda (newlat seen)
+                        (funcall col (cons (car lat) newlat)
+                                 seen))))))
+#+end_src
 
+What does ~(multirember&co a lat f)~ do?
+
+It looks at every atom of the ~lat~ to see whether it is ~eq~ to
+~a~. Those atoms that are not are collected in list ~ls1~; the others
+for which the answer is true are collected in a second list
+~ls2~. Finally, it determines the value of ~(f ls1 ls2)~.
+** The Tenth Commandment
+Build functions to collect more than one value at a time.
+** multiinsertLR&co
+#+begin_src emacs-lisp
+  (defun multiinsertLR&co (new oldL oldR lat col)
+    (cond
+     ((null lat) (funcall col '() 0 0))
+     ((eq (car lat) oldL)
+      (multiinsertLR&co new oldL oldR (cdr lat)
+                        (lambda (newlat L R)
+                          (funcall col (cons new
+                                             (cons oldL newlat))
+                                   (1+ L) R))))
+     ((eq (car lat) oldR)
+      (multiinsertLR&co new oldL oldR (cdr lat)
+                        (lambda (newlat L R)
+                          (funcall col (cons oldR
+                                             (cons new newlat))
+                                   L (1+ R)))))
+     (t (multiinsertLR&co new oldL oldR
+                          (cdr lat)
+                          (lambda (newlat L R)
+                            (funcall col (cons (car lat) newlat)
+                                     L R))))))
+#+end_src
+
+~multiinsertLR&co~ creates a ~newlat~ by inserting ~new~ on the left
+of each istance of ~oldL~ and on the right of each istance of ~oldR~,
+and it calls ~col~ with ~newlat~, the number of left insertions, and
+the number of right insertions.
+** evens-only*
+#+begin_src emacs-lisp
+  (defun evens-only* (l)
+    (cond
+     ((null l) '())
+     ((atomp (car l))
+      (cond
+       ((even? (car l)) (cons (car l) (evens-only* (cdr l))))
+       (t (evens-only* (cdr l)))))
+     (t (cons (evens-only* (car l)) (evens-only* (cdr l))))))
+#+end_src
